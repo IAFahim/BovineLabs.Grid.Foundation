@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>com.bovinelabs.grid.foundation.Runtime</AssemblyName>
+    <RootNamespace>BovineLabs.Grid.Foundation</RootNamespace>
+    <IsPackable>true</IsPackable>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    Unity.Mathematics for CI compilation only.
+    PrivateAssets="All" = compile reference, never copied to output.
+    Unity resolves this via UPM com.unity.mathematics at runtime.
+  -->
+  <ItemGroup>
+    <PackageReference Include="UnityMathematics" Version="$(UnityMathematicsVersion)" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- Source lives in the Unity package folder. This csproj just points at it. -->
+  <ItemGroup>
+    <Compile Include="../../com.bovinelabs.grid.foundation.Runtime/**/*.cs" />
+    <Compile Remove="../../com.bovinelabs.grid.foundation.Runtime/**/bin/**/*.cs" />
+    <Compile Remove="../../com.bovinelabs.grid.foundation.Runtime/**/obj/**/*.cs" />
+  </ItemGroup>
+</Project>

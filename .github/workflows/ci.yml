@@ -1,0 +1,58 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+
+      - name: Restore
+        run: dotnet restore *.slnx
+
+      - name: Build
+        run: dotnet build *.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test *.slnx -c Release --no-build
+
+      - name: Verify no Unity.Mathematics DLL leak
+        run: |
+          # Check committed files
+          if git ls-files | grep -qiE 'Unity\.Mathematics.*\.dll$'; then
+            echo "FAIL: Unity.Mathematics DLL committed!"
+            git ls-files | grep -iE 'Unity\.Mathematics.*\.dll$'
+            exit 1
+          fi
+          # Check package payload (everything except bin/obj)
+          LEAKS=$(find . -path '*/bin' -prune -o -path '*/obj' -prune -o -path './.git' -prune \
+            -o -name 'Unity.Mathematics*.dll' -print 2>/dev/null)
+          if [ -n "$LEAKS" ]; then
+            echo "FAIL: Unity.Mathematics DLL in package!"
+            echo "$LEAKS"
+            exit 1
+          fi
+          echo "OK: No Unity.Mathematics DLL leak."
+
+      - name: Verify no unreplaced placeholders
+        run: |
+          LEFTOVER=$(grep -rl '__[A-Z_]*__' \
+            --include='*.cs' --include='*.json' --include='*.asmdef' . 2>/dev/null \
+            | grep -v '/obj/' | grep -v '/bin/' || true)
+          if [ -n "$LEFTOVER" ]; then
+            echo "FAIL: Unreplaced template placeholders:"
+            echo "$LEFTOVER"
+            exit 1
+          fi
+          echo "OK: No unreplaced placeholders."

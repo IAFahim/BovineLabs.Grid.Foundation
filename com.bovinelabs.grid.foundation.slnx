@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/com.bovinelabs.grid.foundation/com.bovinelabs.grid.foundation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/com.bovinelabs.grid.foundation.Tests/com.bovinelabs.grid.foundation.Tests.csproj" />
+  </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/com.bovinelabs.grid.foundation.Benchmarks/com.bovinelabs.grid.foundation.Benchmarks.csproj" />
+  </Folder>
+</Solution>
